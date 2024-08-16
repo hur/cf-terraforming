@@ -146,6 +146,34 @@ func generateResources() func(cmd *cobra.Command, args []string) {
 				if err != nil {
 					log.Fatal(err)
 				}
+			case "cloudflare_access_policy":
+				applications, _, err := api.ListAccessApplications(context.Background(), identifier, cloudflare.ListAccessApplicationsParams{})
+				if err != nil {
+					log.Fatal(err)
+				}
+				//var jsonPayload []cloudflare.AccessPolicy
+				var accessPolicies []interface{}
+				for _, application := range applications {
+					var tempAccessPolicies []interface{}
+					jsonPayload, _, err := api.ListAccessPolicies(context.Background(), identifier, cloudflare.ListAccessPoliciesParams{ApplicationID: application.ID})
+					if err != nil {
+						log.Fatal(err)
+					}
+					m, _ := json.Marshal(jsonPayload)
+					err = json.Unmarshal(m, &tempAccessPolicies)
+					if err != nil {
+						log.Fatal(err)
+					}
+					// Add application ID field
+					for i := 0; i < len(tempAccessPolicies); i++ {
+						tempAccessPolicies[i].(map[string]interface{})["application_id"] = application.ID
+					}
+
+					accessPolicies = append(accessPolicies, tempAccessPolicies...)
+					//jsonPayload = append(jsonPayload, singleJsonPayload...)
+				}
+				jsonStructData = accessPolicies
+				resourceCount = len(jsonStructData)
 			case "cloudflare_access_service_token":
 				jsonPayload, _, err := api.ListAccessServiceTokens(context.Background(), identifier, cloudflare.ListAccessServiceTokensParams{})
 				if err != nil {
