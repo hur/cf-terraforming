@@ -151,7 +151,7 @@ func generateResources() func(cmd *cobra.Command, args []string) {
 				if err != nil {
 					log.Fatal(err)
 				}
-				//var jsonPayload []cloudflare.AccessPolicy
+
 				var accessPolicies []interface{}
 				for _, application := range applications {
 					var tempAccessPolicies []interface{}
@@ -170,8 +170,8 @@ func generateResources() func(cmd *cobra.Command, args []string) {
 					}
 
 					accessPolicies = append(accessPolicies, tempAccessPolicies...)
-					//jsonPayload = append(jsonPayload, singleJsonPayload...)
 				}
+
 				jsonStructData = accessPolicies
 				resourceCount = len(jsonStructData)
 			case "cloudflare_access_service_token":
